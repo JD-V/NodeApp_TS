@@ -21,7 +21,7 @@ router.post("/", function(req,res){
 // GET/question/:qId
 // Route for retriving question for a specific Id
 router.get("/:qId", function(req,res){
-    res.json({response: "You sent me a get request on /questions/" + req.params.id});
+    res.json({response: "You sent me a get request on /questions/" + req.params.qId});
 })
 
 
@@ -31,7 +31,7 @@ router.get("/:qId", function(req,res){
 router.post("/:qId/answers", function(req,res){
     res.json({
         response: "You sent me a POST request on /questions/:qId/answers",
-        questionUId: req.params.id,
+        questionId: req.params.qId,
         body: req.body
     });
 })
@@ -42,7 +42,7 @@ router.post("/:qId/answers", function(req,res){
 router.put("/:qId/answers/:aId", function(req,res){
     res.json({
         response: "You sent me a PUT request on /questions/:qId/answers/:aId",
-        questionUId: req.params.id,
+        questionId: req.params.qId,
         answerId : req.params.aId,
         body: req.body
     });
@@ -54,7 +54,7 @@ router.put("/:qId/answers/:aId", function(req,res){
 router.delete("/:qId/answers/:aId", function(req,res){
     res.json({
         response: "You sent me a delete request on /questions/:qId/answers/:aId",
-        questionUId: req.params.id,
+        questionId: req.params.qId,
         answerId : req.params.aId,
     });
 })
@@ -67,7 +67,7 @@ router.delete("/:qId/answers/:aId", function(req,res){
 router.post("/:qId/answers/:aId/vote-:dir", function(req,res){
     res.json({
         response: "You sent me a POST request on /questions/:qId/answers/:aId to " + req.params.dir ,
-        questionUId: req.params.id,
+        questionId: req.params.qId,
         answerId : req.paramss.aId,
     });
 })
