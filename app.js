@@ -2,13 +2,17 @@
 
 var express = require('express');
 var jsonParser = require('body-parser').json; 
-var routes = require('./routes');  
+var routes = require('./routes'); 
+var logger = require('morgan'); 
 // body parser contains many parsers underneath 
 //to parser different kind of http request.
 // we need json parser.
 
 var app = express();
+
+app.use(logger("dev"));
 app.use(jsonParser()); 
+
 // json middleware
 // when the app receives a request this middleware 
 //will parse the request and make it available to 
