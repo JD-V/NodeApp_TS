@@ -11,17 +11,17 @@ db.on('error', function(err) {
     console.error("Connection error : ", err);
 });
 
-db.once("open", function(){
+db.once("open", function() {
     console.log("database connection was successful");
     // All database connection was successful;
 
     var Schema = mongoose.Schema;
     var AnimalSchema = new Schema({
-        type: String,
-        color: String,
-        size: String,
-        mass: Number,
-        name: String
+        type: {type:String, default:"goldFish"},
+        color: {type:String, default:"golden"},
+        size: {type:String, default:"small"},
+        mass: {type:Number, default:0.007},
+        name: {type:String, default:"Angela"}
     });
 
     // Create a model named Animal
@@ -36,13 +36,34 @@ db.once("open", function(){
         name: 'Lawrancec'
     });
 
-    elephant.save(function(err){
-        if(err) console.log("Save Failed", err);
-        else console.log("Saved");
-        db.close(function(){
-            console.log("connectin is closed");
-        }); //close the connection
+    var animal = new Animal({}); //Goldfish default value
+
+    //color not supplied should pick up the default
+    var whale = new Animal({   
+        type:'Whale',
+        size:'big',
+        mass:190500,
+        name:'Fig'
     });
 
-    
+     // remove without any condition , will remove all the documents
+    Animal.remove({},function(err) {
+        
+        elephant.save(function(err) {
+            if(err) console.log("Save Failed", err);
+            
+            animal.save(function(err) {
+                if(err) console.log("Save Failed", err);
+
+                whale.save(function(err) {
+                    if(err) console.log("Save Failed", err);
+
+                    db.close(function(){
+                        //close the connection  
+                        console.log("connectin is closed");
+                    }); 
+                });          
+            });
+        });
+    });
 })
