@@ -58,10 +58,16 @@ db.once("open", function() {
                 whale.save(function(err) {
                     if(err) console.log("Save Failed", err);
 
-                    db.close(function(){
-                        //close the connection  
-                        console.log("connectin is closed");
-                    }); 
+                    Animal.find({"size" : "big"}, function(err, animals) {
+                        animals.forEach(function(animal){
+                            console.log(animal.name + " the " + animal.color + " " + animal.type );
+                        });
+
+                        db.close(function() {
+                            //close the connection  
+                            console.log("connectin is closed");
+                        }); 
+                    });
                 });          
             });
         });
