@@ -20,6 +20,24 @@ app.use(jsonParser());
 
 app.use("/questions",routes);   //any equest which will have questions in parameter will be pushed to routes file
 
+app.use(function(req,res,next){
+    var err = new Error("Not Found");
+    err.status = 404;
+    next(err);  //signals the express that there has been an error.
+    // will call next best matching default handler
+    // you can override it as well
+});
+
+// Error Handler simillar to setting up middleware
+// the only difference is it will have 4 params 
+// while normal middleware has 3.
+app.use(function(err,req,res,next) {
+    res.status(err.status || 500); // if no error status defined then it may also be an internal server error (500)
+    res.json({
+        message : err.message
+    })
+})
+
 var port = process.env.port || 3002;
 
 app.listen(port, function(){

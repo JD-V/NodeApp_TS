@@ -64,11 +64,20 @@ router.delete("/:qId/answers/:aId", function(req,res){
 // POST /questions/:id/answers/:id/vote-down
 // POST /questions/:id/answers/:id/vote-down
 // Route for voting a specific answer
-router.post("/:qId/answers/:aId/vote-:dir", function(req,res){
-    res.json({
-        response: "You sent me a POST request on /questions/:qId/answers/:aId to " + req.params.dir ,
-        questionId: req.params.qId,
-        answerId : req.paramss.aId,
+router.post("/:qId/answers/:aId/vote-:dir", function(req,res,next){
+        if(req.params.dir.search(/^(up|down)$/) == -1 ) {   //creating custom error if die contains anything other than up or down
+            var err = new Error("Not Found");
+            err.status = 404;
+            next(err);
+        } else {
+            next();
+        }
+    },
+    function(req,res){
+        res.json({
+            response : "You sent me a POST request on /questions/:qId/answers/:aId to " + req.params.dir ,
+            questionId : req.params.qId,
+            answerId : req.params.aId,
     });
 })
 
