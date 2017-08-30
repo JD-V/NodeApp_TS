@@ -33,7 +33,13 @@ db.once("open", function() {
     AnimalSchema.statics.findSize = function(size, callback) {
         // this == Animal
         return this.find({size:size}, callback);
-    }    
+    }
+
+    //Instance method, here this points to document itself
+    AnimalSchema.methods.findSameColor = function(callback) {
+        //this == document
+        return this.model("Animal").find({color:this.color},callback); // passing name of the model as a string to access it.
+    }
 
     // Pre-hook this handler gets executed before Mongo executes save
     AnimalSchema.pre("save", function(next){
@@ -96,18 +102,21 @@ db.once("open", function() {
     Animal.remove({},function(err) {
         Animal.create(animalData,function(err, animals){
             if(err) console.log("Save Failed", err);
-            Animal.findSize("medium",function(err, animals){
-                animals.forEach(function(animal){
-                    console.log(animal.name + " the " + animal.color + " " + animal.type + " is a " + animal.size + "-sized" );
-                });
 
-                db.close(function() {
-                    //close the connection  
-                    console.log("connectin is closed");
-                });
-            });
+            Animal.findOne({type:"elephant"},function(err, elephant) { // find one is used to find only first matching element.
 
-            
+                elephant.findSameColor(function(err,animals){
+                    animals.forEach(function(animal){
+                        console.log(animal.name + " the " + animal.color + " " + animal.type + " is a " + animal.size + "-sized" );
+                    });
+                    
+                    db.close(function() {
+                     //close the connection  
+                        console.log("connectin is closed");
+                    });
+                });
+                
+            });            
 
         });    
     });
