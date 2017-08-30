@@ -26,18 +26,18 @@ db.once("open", function() {
 
 
     AnimalSchema.statics.findSmall = function(callback) {
-        // this == Animal
+        // this == Animal (modal)
         return this.find({size:'small'}, callback);
     }
 
     AnimalSchema.statics.findSize = function(size, callback) {
-        // this == Animal
+        // this == Animal (modal)
         return this.find({size:size}, callback);
     }
 
     //Instance method, here this points to document itself
     AnimalSchema.methods.findSameColor = function(callback) {
-        //this == document
+        //this == document 
         return this.model("Animal").find({color:this.color},callback); // passing name of the model as a string to access it.
     }
 
@@ -57,6 +57,11 @@ db.once("open", function() {
     // Create a model named Animal
     // This will map to a collection in mongo DB database
     var Animal = mongoose.model("Animal", AnimalSchema);
+    // Mongo has a spcial feature which will pluralize the model name while creating colellection
+    // eg. here model name is 'Animal' but colellection name will be 'animals'
+    // To override this default behaviour you can pass third argument as collection name
+    // like this,
+    // var Animal = mongoose.model("Animal", AnimalSchema, "Animal");
 
     var elephant = new Animal({
         type: 'elephant',
