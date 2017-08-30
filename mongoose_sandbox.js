@@ -25,6 +25,16 @@ db.once("open", function() {
     });
 
 
+    AnimalSchema.statics.findSmall = function(callback) {
+        // this == Animal
+        return this.find({size:'small'}, callback);
+    }
+
+    AnimalSchema.statics.findSize = function(size, callback) {
+        // this == Animal
+        return this.find({size:size}, callback);
+    }    
+
     // Pre-hook this handler gets executed before Mongo executes save
     AnimalSchema.pre("save", function(next){
         if(this.mass >= 100) {
@@ -86,7 +96,7 @@ db.once("open", function() {
     Animal.remove({},function(err) {
         Animal.create(animalData,function(err, animals){
             if(err) console.log("Save Failed", err);
-            Animal.find({}, function(err, animals){
+            Animal.findSize("medium",function(err, animals){
                 animals.forEach(function(animal){
                     console.log(animal.name + " the " + animal.color + " " + animal.type + " is a " + animal.size + "-sized" );
                 });
