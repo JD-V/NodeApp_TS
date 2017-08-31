@@ -2,10 +2,23 @@
 
 var express = require('express');
 var router = express.Router();
+var Question = require('./model').Question;
 
 // GET/questions
 // Route for retriving questions
-router.get("/", function(req,res){
+router.get("/", function(req,res,next){
+    //find method expexts 4 params 
+    //1. criteria
+    //2. projection => used to limit number of rows in result
+    //3. arrange result => pass object literal
+    // here createdAt:-1 means sort decending
+    // 4 => callback
+    Question.find({}, null, {sort: {createdAt: -1}}, function(err,questions) {
+        if(err) return next(err);
+        else {
+            res.json(questions);    //since mongo returns json object we can drop strtight to response
+        }
+    });
     res.json({response: "You sent me a get request on /questions"});
 })
 
@@ -57,7 +70,7 @@ router.delete("/:qId/answers/:aId", function(req,res){
         questionId: req.params.qId,
         answerId : req.params.aId,
     });
-})
+});
 
 
 
