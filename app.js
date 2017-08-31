@@ -4,6 +4,7 @@ var express = require('express');
 var jsonParser = require('body-parser').json; 
 var routes = require('./routes'); 
 var logger = require('morgan'); 
+var mongoose = require('mongoose');
 // body parser contains many parsers underneath 
 //to parser different kind of http request.
 // we need json parser.
@@ -12,6 +13,24 @@ var app = express();
 
 app.use(logger("dev"));
 app.use(jsonParser()); 
+
+mongoose.connect("mongodb://localhost:27017/qa");
+// create mongo server at default port 27017, name the database as 'sandbox'
+
+var db = mongoose.connection;
+
+db.on('error', function(err) {
+    console.error("Connection error : ", err);
+});
+
+db.once("open", function() {
+    console.log("database connection was successful");
+    // All database connection was successful;
+});
+// Till the time mongo take to setup the connections
+// all the requests made during that period will be stroed in a cache by node
+// and executed once connection is established. which is extremly helpful.
+
 
 // json middleware
 // when the app receives a request this middleware 
