@@ -1,47 +1,22 @@
-Denormalizing from Many -> One
+Denormalizing from One -> Many
 
-For the parts example, you could denormalize the name of the part into the ‘parts[]’ array.
-For reference, here’s the version of the Product document without denormalization.
+You can also denormalize fields from the “One” side into the “Many” side:
 
-without denormalizing
-> db.products.findOne()
+> db.parts.findOne()
 {
-    name : 'left-handed smoke shifter',
-    manufacturer : 'Acme Corp',
-    catalog_number: 1234,
-    parts : [     // array of references to Part documents
-        ObjectID('AAAA'),    // reference to the #4 grommet above
-        ObjectID('F17C'),    // reference to a different Part
-        ObjectID('D2AA'),
-        // etc
-    ]
+    _id : ObjectID('AAAA'),
+    partno : '123-aff-456',
+    name : '#4 grommet',
+    product_name : 'left-handed smoke shifter',   // Denormalized from the ‘Product’ document
+    product_catalog_number: 1234,                     // Ditto
+    qty: 94,
+    cost: 0.94,
+    price: 3.99
 }
 
-Denormalizing would mean that you don’t have to perform the application-level join 
-when displaying all of the part names for the product, but you would have to perform 
-that join if you needed any other information about a part.
-
-
-> db.products.findOne()
-{
-    name : 'left-handed smoke shifter',
-    manufacturer : 'Acme Corp',
-    catalog_number: 1234,
-    parts : [
-        { id : ObjectID('AAAA'), name : '#4 grommet' },         // Part name is denormalized
-        { id: ObjectID('F17C'), name : 'fan blade assembly' },
-        { id: ObjectID('D2AA'), name : 'power switch' },
-        // etc
-    ]
-}
-
-While making it easier to get the part names, this would add just a bit of 
-client-side work to the application-level join:
-
-
-// Fetch the product document
-> product = db.products.findOne({catalog_number: 1234});  
-  // Create an array of ObjectID()s containing *just* the part numbers
-> part_ids = product.parts.map( function(doc) { return doc.id } );
-  // Fetch all the Parts that are linked to this Product
-> product_parts = db.parts.find({_id: { $in : part_ids } } ).toArray();
+However, if you’ve denormalized the Product name into the Part document, 
+then when you update the Product name you must also update every place 
+it occurs in the ‘parts’ collection. This is likely to be a more expensive 
+update, since you’re updating multiple Parts instead of a single Product. 
+As such, it’s significantly more important to consider the read-to-write 
+ratio when denormalizing in this way.

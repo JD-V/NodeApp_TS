@@ -1,0 +1,25 @@
+Intermediate: Denormalizing With “One-To-Squillions” Relationships
+
+You can also denormalize the “one-to-squillions” example. This works 
+in one of two ways: you can either put information about the “one” 
+side (from the 'hosts’ document) into the “squillions” side (the log entries),
+ or you can put summary information from the “squillions” side into the “one” side.
+
+Here’s an example of denormalizing into the “squillions” side. 
+I’m going to add the IP address of the host (from the ‘one’ side) into the individual log message:
+
+> db.logmsg.findOne()
+{
+    time : ISODate("2014-03-28T09:42:41.382Z"),
+    message : 'cpu is on fire!',
+    ipaddr : '127.66.66.66',
+    host: ObjectID('AAAB')
+}
+
+Your query for the most recent messages from a particular IP address just got easier: 
+it’s now just one query instead of two.
+
+> last_5k_msg = db.logmsg.find({ipaddr : '127.66.66.66'}).sort({time : -1}).limit(5000).toArray()
+
+
+
