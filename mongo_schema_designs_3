@@ -1,0 +1,37 @@
+One-to-Squillions
+
+An example of “one-to-squillions” might be an event logging system that collects 
+log messages for different machines. 
+Any given host could generate enough messages to overflow the 16 MB document size, 
+even if all you stored in the array was the ObjectID. This is the classic use case 
+for “parent-referencing” – you’d have a document for the host, and then store the
+ObjectID of the host in the documents for the log messages.
+
+
+
+> db.hosts.findOne()
+{
+    _id : ObjectID('AAAB'),
+    name : 'goofy.example.com',
+    ipaddr : '127.66.66.66'
+}
+
+//child message contains parent (host) id
+>db.logmsg.findOne()
+{
+    time : ISODate("2014-03-28T09:42:41.382Z"),
+    message : 'cpu is on fire!',
+    host: ObjectID('AAAB')       // Reference to the Host document
+}
+
+You’d use a (slightly different) application-level join to find the most recent 
+5,000 messages for a host:
+
+
+
+How to Query
+
+ // find the parent ‘host’ document
+> host = db.hosts.findOne({ipaddr : '127.66.66.66'});  // assumes unique index
+   // find the most recent 5000 log message documents linked to that host
+> last_5k_msg = db.logmsg.find({host: host._id}).sort({time : -1}).limit(5000).toArray()

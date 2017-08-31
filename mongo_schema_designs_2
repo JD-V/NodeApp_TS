@@ -1,0 +1,41 @@
+One-to-many
+
+An example of “one-to-many” might be parts for a product in a replacement 
+parts ordering system. Each product may have up to several hundred replacement 
+parts, but never more than a couple thousand or so.
+
+Each Part would have its own document:
+
+//part is child Object
+> db.parts.findOne()
+{
+    _id : ObjectID('AAAA'),
+    partno : '123-aff-456',
+    name : '#4 grommet',
+    qty: 94,
+    cost: 0.94,
+    price: 3.99
+}
+
+
+//product is linked to child by object
+> db.products.findOne()
+{
+    name : 'left-handed smoke shifter',
+    manufacturer : 'Acme Corp',
+    catalog_number: 1234,
+    parts : [     // array of references to Part documents
+        ObjectID('AAAA'),    // reference to the #4 grommet above
+        ObjectID('F17C'),    // reference to a different Part
+        ObjectID('D2AA'),
+        // etc
+    ]
+}
+
+
+how to query items
+
+ // Fetch the Product document identified by this catalog number
+> product = db.products.findOne({catalog_number: 1234});
+   // Fetch all the Parts that are linked to this Product
+> product_parts = db.parts.find({_id: { $in : product.parts } } ).toArray() ;

@@ -1,0 +1,71 @@
+Intermediate: Denormalizing With “One-To-Many” Relationships
+
+For the parts example, you could denormalize the name of the part into the ‘parts[]’ array. 
+For reference, here’s the version of the Product document without denormalization.
+
+
+> db.products.findOne()
+{
+    name : 'left-handed smoke shifter',
+    manufacturer : 'Acme Corp',
+    catalog_number: 1234,
+    parts : [     // array of references to Part documents
+        ObjectID('AAAA'),    // reference to the #4 grommet above
+        ObjectID('F17C'),    // reference to a different Part
+        ObjectID('D2AA'),
+        // etc
+    ]
+}
+
+Denormalizing would mean that you don’t have to perform the application-level join
+when displaying all of the part names for the product, 
+but you would have to perform that join if you needed any other information about a part.
+
+> db.products.findOne()
+{
+    name : 'left-handed smoke shifter',
+    manufacturer : 'Acme Corp',
+    catalog_number: 1234,
+    parts : [
+        { id : ObjectID('AAAA'), name : '#4 grommet' },         // Part name is denormalized
+        { id: ObjectID('F17C'), name : 'fan blade assembly' },
+        { id: ObjectID('D2AA'), name : 'power switch' },
+        // etc
+    ]
+}
+
+//parts
+> db.parts.findOne()
+{
+    _id : ObjectID('AAAA'),
+    partno : '123-aff-456',
+    name : '#4 grommet',
+    product_name : 'left-handed smoke shifter',   // Denormalized from the ‘Product’ document
+    product_catalog_number: 1234,                     // Ditto
+    qty: 94,
+    cost: 0.94,
+    price: 3.99
+}
+
+How to Query
+
+// Fetch the product document
+> product = db.products.findOne({catalog_number: 1234});  
+  // Create an array of ObjectID()s containing *just* the part numbers
+> part_ids = product.parts.map( function(doc) { return doc.id } );
+  // Fetch all the Parts that are linked to this Product
+> product_parts = db.parts.find({_id: { $in : part_ids } } ).toArray() ;
+
+Denormalizing only makes sense when there’s an high ratio of reads to updates. 
+If you’ll be reading the denormalized data frequently, but updating it only 
+rarely, it often makes sense to pay the price of slower updates – and more 
+complex updates – in order to get more efficient queries. As updates become 
+more frequent relative to queries, the savings from denormalization decrease.
+
+
+Also note that if you denormalize a field, you lose the ability to perform 
+atomic and isolated updates on that field. Just like with the two-way 
+referencing example above, if you update the part name in the Part document, 
+and then in the Product document, there will be a sub-second interval where 
+the denormalized ‘name’ in the Product document will not reflect the new, 
+updated value in the Part document.

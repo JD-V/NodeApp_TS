@@ -1,0 +1,34 @@
+Intermediate: Two-Way Referencing
+
+If you want to get a little bit fancier, 
+you can combine two techniques and include both styles of reference in your schema, 
+having both references from the “one” side to the “many” side and references from the
+“many” side to the “one” side.
+
+db.person.findOne()
+{
+    _id: ObjectID("AAF1"),
+    name: "Kate Monster",
+    tasks [     // array of references to Task documents
+        ObjectID("ADF9"), 
+        ObjectID("AE02"),
+        ObjectID("AE73") 
+        // etc
+    ]
+}
+
+
+db.tasks.findOne()
+{
+    _id: ObjectID("ADF9"), 
+    description: "Write lesson plan",
+    due_date:  ISODate("2014-04-01"),
+    owner: ObjectID("AAF1")     // Reference to Person document
+}
+
+This design has all of the advantages and disadvantages of the “One-to-Many” schema,
+but with some additions. Putting in the extra ‘owner’ reference into the Task document 
+means that its quick and easy to find the Task’s owner, but it also means that if you 
+need to reassign the task to another person, you need to perform two updates instead 
+of just one. Specifically, you’ll have to update both the reference from the Person 
+to the Task document, and the reference from the Task to the Person.
