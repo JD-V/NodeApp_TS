@@ -13,18 +13,30 @@ router.get("/", function(req,res,next){
     //3. arrange result => pass object literal
     // here createdAt:-1 means sort decending
     // 4 => callback
-    Question.find({}, null, {sort: {createdAt: -1}}, function(err,questions) {
-        if(err) return next(err);
-        else {
-            res.json(questions);    //since mongo returns json object we can drop strtight to response
-        }
-    });
-    res.json({response: "You sent me a get request on /questions"});
+    Question.find({})
+            .sort({createdAt: -1})
+            .exact(function(err,questions) {
+                if(err) return next(err);
+                else {
+                    res.json(questions);    //since mongo returns json object we can drop strtight to response
+                }
+            });
+    // res.json({response: "You sent me a get request on /questions"});
 })
 
 // POST/questions
 // Route for creating a question
-router.post("/", function(req,res){
+router.post("/", function(req,res,next) {
+
+    var question = new Question(req.body);
+    question.save(function(err,question){
+        if(err) next(err)
+        else {
+            res.status(201);
+            res.json(question);
+        }
+    })
+
     res.json({
         response: "You sent me a POST request on /questions",
         body: req.body
@@ -33,8 +45,14 @@ router.post("/", function(req,res){
 
 // GET/question/:qId
 // Route for retriving question for a specific Id
-router.get("/:qId", function(req,res){
-    res.json({response: "You sent me a get request on /questions/" + req.params.qId});
+router.get("/:qId", function(req,res,next){
+
+    Question.findById(req.param.qId, function(err,question) {
+        if(err) return next(err);
+        else {
+            res.json(question);    //since mongo returns json object we can drop strtight to response
+        }
+    });
 })
 
 
