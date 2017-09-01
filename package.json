@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "strat":"node ./app.js"
   },
   "keywords": [],
   "author": "",
@@ -15,5 +16,8 @@
     "mongodb": "^2.2.31",
     "mongoose": "^4.4.20",
     "morgan": "^1.7.0"
+  },
+  "engines": {
+    "node":"4.5.0" 
   }
 }
