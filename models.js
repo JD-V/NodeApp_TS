@@ -1,6 +1,6 @@
 'use strict'
 
-var mongoose = require('nongoose');
+var mongoose = require('mongoose');
 
 var schema = mongoose.Schema;   //schema constructor
 
@@ -18,60 +18,58 @@ var sortAnswers = function(a,b) {
     return b.votes-a.votes;
 }
 
-var AnswerSchema = new Schema({
-    text:string,
-    createdAt: {Date},  //using default value will replace value of createdAt with current date time.
-    updatedAt: {Date},  //using default value will replace value of createdAt with current date time.
+var AnswerSchema = new schema({
+    text:String,
+    createdAt: {type:Date, default:Date.now},  
+    updatedAt: {type:Date, default:Date.now},
     votes: {type:Number, default:0}
-
 });
 
 // creating instance method (another way to create it)
 // notice one thing, mongooese alerady has save method
 // so we have named this as update method otherwise it
 // will adversly affect save operation
-AnswerSchema.methods("update", function(updates,callback){
+AnswerSchema.method("update", function(updates,callback){
     //this == document
     // Object.assign(target, ...sources)
     // Properties in the target object will be overwritten by properties 
     // in the sources if they have the same key.  
     // Later sources' properties will similarly overwrite earlier ones.  
-    object.assign(this, updates, {updatedAt: Date.now});
-
+    Object.assign(this, updates, {updatedAt: new Date()} );
     this.parent().save(callback);
 })
-
 
 // Q. What's the easiest way to get a reference to a parent document in mongoose if you have its child?
 // A. call the child document's parent() method.
 
-AnswerSchema.methods("votes", function(updates,callback){
-   if(votes == up)
+AnswerSchema.method("vote", function(vote,callback) {
+   if(vote == "up")
         this.votes += 1;
     else
         this.votes -= 1;
 
+        console.log(this);
     this.parent().save(callback);
-})
+});
 
-
-var QuestionsSchema = new mongoose.Schema({
-    text:String,
-    createdAt: {type:Date, default:Date.now},  //using default value will replace value of createdAt with current date time.
+//using default value will replace value of createdAt with current date time.
+var QuestionSchema = new schema({
+    text: String,
+    createdAt: {type:Date, default:Date.now},  
     answers: [AnswerSchema]
 });
 
 
 // By using this pre save hook 
 // mongo will sort answers array every time it sorts.
-Question.pre("save", function(next) {
+QuestionSchema.pre("save", function(next) {
     // sort() is a default javascript sort method and cannot sort objects, here anserws is obeject array [object, object]
     // you can use your custom sortig logic as well.
     this.answers.sort(sortAnswers); 
     next();
 });
 
-var Question = mongoose.model("question", QuestionsSchema);
+var Question = mongoose.model("question", QuestionSchema);
 
 module.exports.Question = Question;
 

@@ -2,7 +2,7 @@
 
 var express = require('express');
 var jsonParser = require('body-parser').json; 
-var routes = require('./routes'); 
+var routes = require('./routes');
 var logger = require('morgan'); 
 var mongoose = require('mongoose');
 // body parser contains many parsers underneath 
@@ -13,8 +13,8 @@ var app = express();
 
 app.use(logger("dev"));
 app.use(jsonParser()); 
-
-mongoose.connect("mongodb://localhost:27017/qa");
+//mongodb://localhost:27017/qa
+mongoose.connect("mongodb://Jaydeep:Bats1918@ds115214.mlab.com:15214/qa");
 // create mongo server at default port 27017, name the database as 'sandbox'
 
 var db = mongoose.connection;
@@ -36,6 +36,23 @@ db.once("open", function() {
 // when the app receives a request this middleware 
 //will parse the request and make it available to 
 //next middleware as json object
+
+
+
+//To Allow CORS (cross origin resource sharing) you need add header 1
+//To allow api over browser you need to add header2
+app.use(function(req,res,next){
+    res.header("Access-Control-Allow-Origin","*"); // header 1
+    res.header("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type"); //header 2
+    
+    if(req.method === "OPTIONS") {
+        res.header("Access-Control-Allow-Methods","PUT,POST,DELETE");
+        res.status(200);
+        return res.json({});
+    }
+    next();
+})
+
 
 app.use("/questions",routes);   //any equest which will have questions in parameter will be pushed to routes file
 
